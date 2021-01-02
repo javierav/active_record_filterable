@@ -1,0 +1,113 @@
+name: CI
+on: [push, pull_request]
+env:
+  CI: true
+jobs:
+  rspec-mysql:
+    name: RSpec MySQL
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        ruby: [2.6.6, 2.7.2, 3.0.0]
+        # rails: [5.2, 6.0, 6.1]
+      fail-fast: false
+    env:
+      DATABASE: mysql
+      DATABASE_URL: 'mysql2://root:@127.0.0.1:3306/active_record_filterable_test'
+    services:
+      mysql:
+        image: mysql:5.7
+        env:
+          MYSQL_ALLOW_EMPTY_PASSWORD: yes
+          MYSQL_DATABASE: active_record_filterable_test
+        ports: [ "3306:3306" ]
+        options: >-
+          --health-cmd="mysqladmin ping"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=3
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Install MySQL client
+        run: |
+          sudo apt-get -yqq install libmysqlclient-dev
+
+      - name: Setup Ruby ${{ matrix.ruby }}
+        uses: ruby/setup-ruby@v1
+        with:
+          bundler-cache: true
+          ruby-version: ${{ matrix.ruby }}
+
+      - name: Run tests
+        run: |
+          bundle exec rspec
+
+  rspec-postgresql:
+    name: RSpec PostgreSQL
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        ruby: [ 2.6.6, 2.7.2, 3.0.0 ]
+        # rails: [5.2, 6.0, 6.1]
+      fail-fast: false
+    env:
+      DATABASE: postgresql
+      DATABASE_URL: 'postgresql://postgres:@127.0.0.1:5432/active_record_filterable_test'
+    services:
+      postgres:
+        image: postgres:12.1
+        ports: [ "5432:5432" ]
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        env:
+          POSTGRES_DB: active_record_filterable_test
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Install PostgreSQL client
+        run: |
+          sudo apt-get -yqq install libpq-dev
+
+      - name: Setup Ruby ${{ matrix.ruby }}
+        uses: ruby/setup-ruby@v1
+        with:
+          bundler-cache: true
+          ruby-version: ${{ matrix.ruby }}
+
+      - name: Configure postgresql database
+        run: |
+          psql -h 127.0.0.1 -d active_record_filterable_test -c 'CREATE EXTENSION unaccent;' -U postgres
+
+      - name: Run tests
+        run: |
+          bundle exec rspec
+
+  rspec-sqlite:
+    name: RSpec SQLite
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        ruby: [ 2.6.6, 2.7.2, 3.0.0 ]
+        # rails: [5.2, 6.0, 6.1]
+      fail-fast: false
+    env:
+      DATABASE: sqlite
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Setup Ruby ${{ matrix.ruby }}
+        uses: ruby/setup-ruby@v1
+        with:
+          bundler-cache: true
+          ruby-version: ${{ matrix.ruby }}
+
+      - name: Run tests
+        run: |
+          bundle exec rspec

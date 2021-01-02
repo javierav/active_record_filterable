@@ -1,6 +1,4 @@
-test:
-  adapter: postgresql
-  username: postgres
-  database: active_record_filterable_test
-  pool: 5
-  timeout: 5000
+adapter: postgresql
+database: active_record_filterable_test
+pool: 5
+timeout: 5000

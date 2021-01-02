@@ -64,7 +64,7 @@ module ActiveRecord
         adapter_name = ActiveRecord::Base.connection.adapter_name.downcase
 
         body =
-          if adapter_name.starts_with?('postgresql')
+          if adapter_name.to_sym.starts_with?('postgresql')
             lambda { |value|
               where("unaccent(#{attr}) ILIKE unaccent(?)", "%#{sanitize_sql_like(value)}%")
             }

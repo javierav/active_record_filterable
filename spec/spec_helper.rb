@@ -10,7 +10,9 @@ db_config = YAML.safe_load(
   File.open("#{__dir__}/support/database_#{ENV['DATABASE'] || 'sqlite'}.yml")
 )
 
-ActiveRecord::Base.establish_connection(db_config['test'])
+db_config.merge!(url: ENV['DATABASE_URL']) if ENV['DATABASE_URL'].present?
+
+ActiveRecord::Base.establish_connection(db_config)
 
 ActiveRecord::Base.connection.create_table(:cities, force: true, collate: :nocase) do |t|
   t.boolean :active, default: true

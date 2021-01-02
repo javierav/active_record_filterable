@@ -1,5 +1,5 @@
 # ActiveRecord::Filterable
-![Build Status](https://travis-ci.org/nosolosoftware/active_record_filterable.svg?branch=master)
+![CI](https://github.com/nosolosoftware/active_record_filterable/workflows/CI/badge.svg)
 
 Let you add scopes to active_record document for filters.
 

@@ -1,5 +1,4 @@
-test:
-  adapter: sqlite3
-  database: db/active_record_filterable_test.sqlite3
-  pool: 5
-  timeout: 5000
+adapter: sqlite3
+database: db/active_record_filterable_test.sqlite3
+pool: 5
+timeout: 5000
